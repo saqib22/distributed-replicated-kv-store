@@ -1,0 +1,20 @@
+#
+# Build Stage
+#
+FROM maven:3.8.5-openjdk-18-slim AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
+
+#
+# Package stage
+#
+FROM openjdk:11-jre-slim
+COPY --from=build /home/app/target/kv-server.jar /usr/local/lib/kv-server.jar
+EXPOSE 8080
+#EXPOSE 0000-99999
+ENTRYPOINT ["java","-jar","/usr/local/lib/kv-server.jar"]
+
+# How to use the testing system (not for general use)
+# docker build -t gitlab.lrz.de:5005/cdb-22/milestone4/gr5/kv-server .
+# docker push gitlab.lrz.de:5005/cdb-22/milestone4/gr5/kv-server
